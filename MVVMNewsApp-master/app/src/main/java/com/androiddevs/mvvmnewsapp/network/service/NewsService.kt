@@ -1,6 +1,6 @@
 package com.androiddevs.mvvmnewsapp.network.service
 
-import com.androiddevs.mvvmnewsapp.NetworkNewsResponseContainer
+import com.androiddevs.mvvmnewsapp.models.NetworkNewsResponseContainer
 import com.androiddevs.mvvmnewsapp.network.NetworkConstants.ApiConstants
 import retrofit2.Response
 import retrofit2.http.GET
