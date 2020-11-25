@@ -1,6 +1,7 @@
 package com.androiddevs.mvvmnewsapp.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -11,6 +12,7 @@ import com.androiddevs.mvvmnewsapp.repository.NewsRepository
 import com.androiddevs.mvvmnewsapp.ui.viewmodels.NewsHomeViewModel
 import com.androiddevs.mvvmnewsapp.ui.viewmodels.viewmodelfactory.NewsViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,5 +31,6 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, newsViewModelFactory).get(NewsHomeViewModel::class.java)
 
         bottomNavigationView.setupWithNavController(navHostFramgent.findNavController())
+
     }
 }

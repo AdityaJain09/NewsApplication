@@ -48,5 +48,9 @@
         android:id="@+id/articleView"
         android:name="com.androiddevs.mvvmnewsapp.ui.ArticleView"
         android:label="ArticleView"
-        tools:layout="@layout/fragment_article"/>
+        tools:layout="@layout/fragment_article">
+        <argument
+            android:name="article"
+            app:argType="com.androiddevs.mvvmnewsapp.models.Article" />
+    </fragment>
 </navigation>

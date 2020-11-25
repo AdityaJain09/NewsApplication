@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.androiddevs.mvvmnewsapp.models.Article
 import com.androiddevs.mvvmnewsapp.models.NetworkNewsResponse
 import com.androiddevs.mvvmnewsapp.repository.NewsRepository
 import kotlinx.coroutines.launch
@@ -47,5 +48,15 @@ class NewsHomeViewModel(private val newsRepo : NewsRepository) : ViewModel() {
             }
         }
         return Resource.Error(response.message())
+    }
+
+    fun insertArticle(article: Article) = viewModelScope.launch {
+        newsRepo.insertToDatabase(article)
+    }
+
+    fun getAllSavedArticles() = newsRepo.getAllSavedArticles()
+
+    fun deleteArticle(article: Article) = viewModelScope.launch {
+        newsRepo.deleteArticle(article)
     }
 }

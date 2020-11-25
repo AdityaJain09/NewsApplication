@@ -23,7 +23,7 @@ abstract class ArticleDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE : ArticleDatabase? = null
 
-        fun getInstance(context: Context): ArticleDatabase? {
+        fun getInstance(context: Context): ArticleDatabase {
                 synchronized(this) {
                     var instance = INSTANCE
                     if(instance == null) {
