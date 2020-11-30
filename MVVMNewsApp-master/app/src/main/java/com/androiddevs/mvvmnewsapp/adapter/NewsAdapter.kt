@@ -51,7 +51,6 @@ class NewsAdapter() : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
             tvDescription.text = item.description
             tvPublishedAt.text = item.publishedAt
              setOnClickListener{
-                 Log.d("AdityaResult", "adapter clicklistenr $it")
                  onItemClickListener?.let {
                      Log.d("AdityaResult", "adapter clicklistenr $it and ${it(item)}")
                      it(item)
@@ -64,8 +63,6 @@ class NewsAdapter() : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
     private var onItemClickListener : ((Article) -> Unit)? = null
 
     fun setOnClickListener(listener : (Article) -> Unit){
-        Log.d("AdityaResult", "adapter setOncclicklistenr $listener and $onItemClickListener }")
         onItemClickListener = listener
-        Log.d("AdityaResullt", "adapter setOncclicklistenr 22222 $listener and $onItemClickListener }")
     }
 }
