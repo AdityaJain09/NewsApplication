@@ -7,7 +7,7 @@ data class NetworkNewsResponseContainer(
 
 
 data class NetworkNewsResponse(
-    val articles: List<Article>,
+    val articles: MutableList<Article>,
     val status: String,
     val totalResults: Int
 )

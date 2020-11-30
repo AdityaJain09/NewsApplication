@@ -12,7 +12,7 @@ interface NewsService {
     @GET("v2/top-headlines")
     suspend fun getTopHeadlines(
         @Query("country")
-        countryName : String = "india",
+        countryName : String,
         @Query("page")
         pageNumber : Int = 1,
         @Query("apiKey")

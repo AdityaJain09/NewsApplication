@@ -17,12 +17,17 @@ class NewsHomeViewModel(private val newsRepo : NewsRepository) : ViewModel() {
     init {
         getTopHeadlines("us")
     }
-    private val pageNumber = 1
-    private val searchPageNumber = 1
+    var breakingPageNumber = 1
+    private var breakingNewsRecord : NetworkNewsResponse? = null
+
+    var searchPageNumber = 1
+    private var searchNewsRecord : NetworkNewsResponse? = null
 
     fun getTopHeadlines(country : String) = viewModelScope.launch {
         topHealdines.postValue(Resource.Loading())
-        val response = newsRepo.getTopHeadlinesData(country, pageNumber)
+        val response = newsRepo.getTopHeadlinesData(country, breakingPageNumber)
+        Log.d("NewsHomeViewModel", "********** ${response.body()?.articles?.size}")
+        Log.d("NewsHomeViewModel", "********** ${response.isSuccessful}")
         topHealdines.postValue(responseArticleResult(response))
     }
 
@@ -35,7 +40,20 @@ class NewsHomeViewModel(private val newsRepo : NewsRepository) : ViewModel() {
     private fun responseArticleResult(response : Response<NetworkNewsResponse>) : Resource<NetworkNewsResponse>{
         if (response.isSuccessful){
             response.body()?.let { data ->
-                return Resource.Success(data)
+                breakingPageNumber++
+                if(breakingNewsRecord == null){
+                    Log.d("NewsHomeViewModel", "first response == == = = = ${data.articles.size}")
+                    breakingNewsRecord = data
+                }else {
+                    val oldArticles = breakingNewsRecord?.articles
+                    val newArticles = data.articles
+                    oldArticles?.addAll(newArticles)
+                    Log.d("NewsHomeViewModel", "articles == == = = = ${oldArticles?.size} and new data   " +
+                            "${data.articles.size}")
+                    Log.d("NewsHomeViewModel", "breakingnewsRecord == == = = = ${breakingNewsRecord} and new data   " +
+                            "${data}")
+                }
+                return Resource.Success(breakingNewsRecord ?: data)
             }
         }
         return Resource.Error(response.message())
@@ -44,7 +62,14 @@ class NewsHomeViewModel(private val newsRepo : NewsRepository) : ViewModel() {
     private fun responseSearchResult(response : Response<NetworkNewsResponse>) : Resource<NetworkNewsResponse>{
         if (response.isSuccessful){
             response.body()?.let { data ->
-                return Resource.Success(data)
+                if(searchNewsRecord == null){
+                    searchNewsRecord = data
+                } else{
+                    val oldArticles = searchNewsRecord?.articles
+                    val newArticles = data.articles
+                    oldArticles?.addAll(newArticles)
+                }
+                return Resource.Success(searchNewsRecord ?: data)
             }
         }
         return Resource.Error(response.message())
