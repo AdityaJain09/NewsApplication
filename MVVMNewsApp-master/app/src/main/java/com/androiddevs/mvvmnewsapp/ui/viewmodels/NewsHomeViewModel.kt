@@ -1,6 +1,14 @@
 package com.androiddevs.mvvmnewsapp.ui.viewmodels
 
+import android.app.ActivityManager
+import android.app.Application
+import android.app.Service
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities.*
+import android.os.Build
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,8 +17,10 @@ import com.androiddevs.mvvmnewsapp.models.NetworkNewsResponse
 import com.androiddevs.mvvmnewsapp.repository.NewsRepository
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import java.io.IOException
 
-class NewsHomeViewModel(private val newsRepo : NewsRepository) : ViewModel() {
+class NewsHomeViewModel(val applicationContext : Application,
+                        private val newsRepo : NewsRepository) : AndroidViewModel(applicationContext) {
     val topHealdines :  MutableLiveData<Resource<NetworkNewsResponse>> = MutableLiveData()
     val searchTopHealdines :  MutableLiveData<Resource<NetworkNewsResponse>> = MutableLiveData()
 
@@ -24,17 +34,33 @@ class NewsHomeViewModel(private val newsRepo : NewsRepository) : ViewModel() {
     private var searchNewsRecord : NetworkNewsResponse? = null
 
     fun getTopHeadlines(country : String) = viewModelScope.launch {
-        topHealdines.postValue(Resource.Loading())
-        val response = newsRepo.getTopHeadlinesData(country, breakingPageNumber)
-        Log.d("NewsHomeViewModel", "********** ${response.body()?.articles?.size}")
-        Log.d("NewsHomeViewModel", "********** ${response.isSuccessful}")
-        topHealdines.postValue(responseArticleResult(response))
+        getTopHeadlinesOnConnection(country)
+        Log.d("NewsHomeViewModel","is checkInternetCOnnectivity****** = ${checkInternetConnectivity()}")
     }
 
     fun getSearchTopHeadlines(searchString : String) = viewModelScope.launch {
         searchTopHealdines.postValue(Resource.Loading())
         val response = newsRepo.searchNews(searchString, searchPageNumber)
         searchTopHealdines.postValue(responseSearchResult(response))
+    }
+
+    private suspend fun getTopHeadlinesOnConnection(country: String) {
+        topHealdines.postValue(Resource.Loading())
+        Log.d("NewsHomeViewModel","is checkInternetCOnnectivity****** = ${checkInternetConnectivity()}")
+        try {
+            if (checkInternetConnectivity()) {
+                val response = newsRepo.getTopHeadlinesData(country, breakingPageNumber)
+                topHealdines.postValue(responseArticleResult(response))
+            }
+            else{
+                topHealdines.postValue(Resource.Error("No Internet Connection"))
+            }
+        }catch (t : Throwable){
+            when(t) {
+                is IOException -> topHealdines.postValue(Resource.Error("Network Failure"))
+                else -> topHealdines.postValue(Resource.Error("Conversion Error"))
+            }
+        }
     }
 
     private fun responseArticleResult(response : Response<NetworkNewsResponse>) : Resource<NetworkNewsResponse>{
@@ -83,5 +109,23 @@ class NewsHomeViewModel(private val newsRepo : NewsRepository) : ViewModel() {
 
     fun deleteArticle(article: Article) = viewModelScope.launch {
         newsRepo.deleteArticle(article)
+    }
+
+    private fun checkInternetConnectivity() : Boolean{
+
+      val connectivityManager  = getApplication<BaseApplicationContext>().getSystemService(
+          Context.CONNECTIVITY_SERVICE ) as ConnectivityManager
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            val activeNetwork = connectivityManager.activeNetwork ?: return false
+            val capability = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+            return  when{
+                capability.hasTransport(TRANSPORT_WIFI) -> true
+                capability.hasTransport(TRANSPORT_CELLULAR) -> true
+                capability.hasTransport(TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        }
+      return  false
     }
 }

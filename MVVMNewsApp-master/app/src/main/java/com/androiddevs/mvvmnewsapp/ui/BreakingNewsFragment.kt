@@ -14,6 +14,7 @@ import com.androiddevs.mvvmnewsapp.R
 import com.androiddevs.mvvmnewsapp.adapter.NewsAdapter
 import com.androiddevs.mvvmnewsapp.ui.viewmodels.NewsHomeViewModel
 import com.androiddevs.mvvmnewsapp.ui.viewmodels.Resource
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_breaking_news.*
 
 class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news){
@@ -53,6 +54,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news){
                     hideProgressBar()
                     response.message?.let { errorMessage ->
                         Log.d("BreakingNewsFragment", "message -> $errorMessage")
+                        Snackbar.make(view, "No internet Connection", Snackbar.LENGTH_SHORT).show()
                     }
                 }
 
